@@ -57,6 +57,10 @@ public class Application {
         // game setup
         gameMap.at(24, 11).addItem(new Talisman());
 
+        // In Application.java, after adding the player
+        gameMap.at(20, 8).addActor(new SpiritGoat());
+        gameMap.at(21, 9).addActor(new OmenSheep());
+
         world.run();
     }
 }
