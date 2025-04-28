@@ -12,4 +12,9 @@ public class BareFist extends IntrinsicWeapon {
     public BareFist() {
         super(25, "punches", 50);
     }
+
+    @Override
+    public String toString() {
+        return "BareFist";
+    }
 }
