@@ -1,12 +1,10 @@
 package game;
 
-import edu.monash.fit2099.engine.*;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
-import edu.monash.fit2099.engine.weapons.IntrinsicWeapon;
+import edu.monash.fit2099.engine.weapons.Weapon;
 
-import java.util.Random;
 
 /**
  * An action to attack another actor with the attacker's intrinsic weapon.
@@ -30,30 +28,26 @@ public class AttackAction extends Action {
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-        IntrinsicWeapon weapon = actor.getIntrinsicWeapon();
+        Weapon weapon;
+
+        // Check if actor is Player (which has getWeapon method)
+        if (actor instanceof Player) {
+            weapon = ((Player) actor).getWeapon();
+        } else {
+            // For other actors, use intrinsic weapon
+            weapon = actor.getIntrinsicWeapon();
+        }
+
         if (weapon == null) {
             return actor + " has no weapon to attack " + target;
         }
 
-        // Hardcode BareFist properties (damage=25, hitRate=50, verb="punches")
-        int damage = 25;
-        int hitRate = 50;
-        String verb = "punches";
-        float damageMultiplier = 1.0f; // Default multiplier from Actor
-
-        String result = actor + " " + verb + " " + target;
-        if (new Random().nextInt(100) < hitRate) {
-            int finalDamage = Math.round(damage * damageMultiplier);
-            target.hurt(finalDamage);
-            result += " for " + finalDamage + " damage";
-            if (!target.isConscious()) {
-                map.removeActor(target);
-                result += "\n" + target + " is killed";
-            }
-        } else {
-            result += " and misses";
+        // Apply stamina cost if using Talisman
+        if (actor instanceof Player) {
+            ((Player) actor).applyAttackStaminaCost();
         }
-        return result;
+
+        return weapon.attack(actor, target, map);
     }
 
     /**
