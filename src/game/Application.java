@@ -54,12 +54,20 @@ public class Application {
         Player player = new Player("Farmer", '@', 100);
         world.addPlayer(player, gameMap.at(23, 10));
 
+        // Add these lines after creating the player
+        player.addItemToInventory(new InheritreeSeed());
+        player.addItemToInventory(new BloodroseSeed());
+
         // game setup
         gameMap.at(24, 11).addItem(new Talisman());
 
         // In Application.java, after adding the player
         gameMap.at(20, 8).addActor(new SpiritGoat());
         gameMap.at(21, 9).addActor(new OmenSheep());
+
+        gameMap.at(22, 9).addItem(new Talisman());
+        gameMap.at(18, 7).addActor(new RotWolf(player));
+        gameMap.at(25, 12).addActor(new RotWolf(player));
 
         world.run();
     }
