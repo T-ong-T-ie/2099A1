@@ -10,28 +10,25 @@ import edu.monash.fit2099.engine.positions.GameMap;
 /**
  * A non-hostile creature that wanders in the valley.
  */
-public class SpiritGoat extends Actor {
+public class SpiritGoat extends RottableActor {
     private final WanderBehaviour wanderBehaviour;
 
     /**
      * Constructor for SpiritGoat.
      */
     public SpiritGoat() {
-        super("Spirit Goat", 'y', 50);
+        super("Spirit Goat", 'y', 50, 10); // 10 turns countdown
         this.addCapability(Status.NON_HOSTILE);
         this.wanderBehaviour = new WanderBehaviour();
     }
 
-    /**
-     * Selects a wandering action or does nothing.
-     * @param actions    List of possible actions
-     * @param lastAction The last action performed
-     * @param map        The game map
-     * @param display    The display for output
-     * @return The selected action
-     */
     @Override
-    public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
+    public boolean isCurable() {
+        return true; // Can be cured by talisman
+    }
+
+    @Override
+    protected Action getNextAction(ActionList actions, Action lastAction, GameMap map, Display display) {
         Action wander = wanderBehaviour.getAction(this, map);
         if (wander != null) {
             return wander;
