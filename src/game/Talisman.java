@@ -1,13 +1,15 @@
 package game;
 
+import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.actors.attributes.ActorAttributeOperations;
 import edu.monash.fit2099.engine.actors.attributes.BaseActorAttributes;
-import java.util.Random;
+import edu.monash.fit2099.engine.positions.Exit;
+import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 
 /**
- * A talisman weapon that can be used to attack enemies.
+ * A talisman weapon that can be used to attack enemies and cure rot.
  */
 public class Talisman extends WeaponItem {
     /**
@@ -18,19 +20,48 @@ public class Talisman extends WeaponItem {
     }
 
     @Override
-    public String attack(Actor attacker, Actor target, GameMap map) {
-        Random rand = new Random();
-        if (!(rand.nextInt(100) < this.chanceToHit())) {
-            return attacker + " misses " + target + ".";
+    public ActionList allowableActions(Actor owner, GameMap map) {
+        ActionList actions = new ActionList();
+        Location actorLocation = map.locationOf(owner);
+
+        // Add cure actions for all adjacent locations
+        for (Exit exit : actorLocation.getExits()) {
+            Location destination = exit.getDestination();
+
+            // Check if destination has something curable (ground or actor)
+            if ((destination.getGround() instanceof CurableGround &&
+                    ((CurableGround)destination.getGround()).isCurable()) ||
+                    (destination.containsAnActor() && destination.getActor() instanceof Rottable &&
+                            ((Rottable)destination.getActor()).isCurable())) {
+
+                actions.add(new TalismanCureAction(destination));
+            }
         }
 
-        target.hurt(this.damage());
-        String result = String.format("%s %s %s for %d damage", attacker, this.verb(), target, this.damage());
-        if (!target.isConscious()) {
-            map.removeActor(target);
-            result += "\n" + target + " is killed";
+        // Check the current location too
+        if ((actorLocation.getGround() instanceof CurableGround &&
+                ((CurableGround)actorLocation.getGround()).isCurable()) ||
+                (actorLocation.containsAnActor() && actorLocation.getActor() instanceof Rottable &&
+                        ((Rottable)actorLocation.getActor()).isCurable())) {
+
+            actions.add(new TalismanCureAction(actorLocation));
         }
-        return result;
+
+        return actions;
+    }
+
+    @Override
+    public String attack(Actor attacker, Actor target, GameMap map) {
+        // Apply stamina cost if attacker is a player
+        if (attacker instanceof Player) {
+            Player player = (Player) attacker;
+            if (!canAttack(player)) {
+                return attacker + " is too tired to attack with Talisman!";
+            }
+            applyStaminaCost(player);
+        }
+
+        return super.attack(attacker, target, map);
     }
 
     /**
@@ -39,7 +70,6 @@ public class Talisman extends WeaponItem {
      * @return true if stamina >= 20, false otherwise
      */
     public boolean canAttack(Actor actor) {
-        // Use BaseActorAttributes.STAMINA instead of String "STAMINA"
         Integer stamina = actor.getAttribute(BaseActorAttributes.STAMINA);
         return stamina != null && stamina >= 20;
     }
@@ -49,12 +79,6 @@ public class Talisman extends WeaponItem {
      * @param actor The actor using the Talisman
      */
     public void applyStaminaCost(Actor actor) {
-        // Add the ActorAttributeOperations.DECREASE parameter
         actor.modifyAttribute(BaseActorAttributes.STAMINA, ActorAttributeOperations.DECREASE, 20);
-    }
-
-    @Override
-    public String toString() {
-        return "Talisman";
     }
 }
