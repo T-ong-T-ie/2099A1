@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 
 /**
  * Base class for actors that can be affected by rot
@@ -56,9 +57,40 @@ public abstract class RottableActor extends Actor implements Rottable {
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
         // Check if rot timer has expired
         if (decrementRotTimer()) {
-            // Actor turns into a RotWolf when rot timer expires
+            // Get the actor's location before removing it
+            Location currentLocation = map.locationOf(this);
+
+            // Remove the actor from the map
             map.removeActor(this);
-            map.addActor(new RotWolf(map.at(23, 10).getActor()), map.locationOf(this));
+
+            // Create a RotWolf at the current location
+            if (currentLocation != null) {
+                // Find the player to target
+                Actor player = null;
+
+                // Loop through the map dimensions to find actors
+                for (int x : map.getXRange()) {
+                    for (int y : map.getYRange()) {
+                        Location location = map.at(x, y);
+                        if (location.containsAnActor()) {
+                            Actor actor = location.getActor();
+                            if (actor instanceof Player) {
+                                player = actor;
+                                break;
+                            }
+                        }
+                    }
+                    if (player != null) break;
+                }
+
+                // Add the RotWolf at the same location where this actor was
+                if (player != null) {
+                    map.addActor(new RotWolf(player), currentLocation);
+                } else {
+                    // If no player found, create a RotWolf with null target (it will just wander)
+                    map.addActor(new RotWolf(null), currentLocation);
+                }
+            }
             return new DoNothingAction();
         }
 
