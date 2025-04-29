@@ -1,59 +1,71 @@
 package game;
 
+import java.util.Random;
+
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
-import edu.monash.fit2099.engine.weapons.Weapon;
 
 
 /**
- * An action to attack another actor with the attacker's intrinsic weapon.
+ * Special Action for attacking other Actors.
  */
 public class AttackAction extends Action {
+
+    /**
+     * The Actor that is to be attacked
+     */
     private Actor target;
 
     /**
+     * Random number generator
+     */
+    private Random rand = new Random();
+
+    /**
      * Constructor.
-     * @param target The actor to attack
+     *
+     * @param target the Actor to attack
      */
     public AttackAction(Actor target) {
         this.target = target;
     }
 
     /**
-     * Executes the attack, applying damage based on the weapon's hit chance.
-     * @param actor The actor performing the attack
-     * @param map   The game map
-     * @return A description of the attack outcome
+     * Execute the attack action.
+     *
+     * @param actor The actor performing the action.
+     * @param map   The map the actor is on.
+     * @return a description of what happened that can be displayed to the user.
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-        Weapon weapon;
-
-        // Check if actor is Player (which has getWeapon method)
         if (actor instanceof Player) {
-            weapon = ((Player) actor).getWeapon();
+            // Player can have an equipped weapon or use intrinsic weapon
+            Player player = (Player) actor;
+            WeaponItem equippedWeapon = player.getEquippedWeapon();
+
+            // Apply stamina cost for attack (this method needs to be added)
+            player.applyAttackStaminaCost();
+
+            if (equippedWeapon != null) {
+                // Use equipped weapon if available
+                return equippedWeapon.attack(actor, target, map);
+            } else {
+                // Use intrinsic weapon otherwise
+                return actor.getIntrinsicWeapon().attack(actor, target, map);
+            }
         } else {
-            // For other actors, use intrinsic weapon
-            weapon = actor.getIntrinsicWeapon();
+            // Non-player actors just use their intrinsic weapon
+            return actor.getIntrinsicWeapon().attack(actor, target, map);
         }
-
-        if (weapon == null) {
-            return actor + " has no weapon to attack " + target;
-        }
-
-        // Apply stamina cost if using Talisman
-        if (actor instanceof Player) {
-            ((Player) actor).applyAttackStaminaCost();
-        }
-
-        return weapon.attack(actor, target, map);
     }
 
     /**
-     * Describes the attack action for the menu.
-     * @param actor The actor performing the attack
-     * @return The menu description
+     * Returns a descriptive string for the menu.
+     *
+     * @param actor The actor performing the action.
+     * @return a String describing the action, suitable for displaying in the menu.
      */
     @Override
     public String menuDescription(Actor actor) {
