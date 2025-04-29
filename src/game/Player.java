@@ -2,6 +2,7 @@ package game;
 
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
+import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.attributes.ActorAttributeOperations;
 import edu.monash.fit2099.engine.actors.attributes.BaseActorAttribute;
@@ -14,63 +15,55 @@ import edu.monash.fit2099.engine.displays.Menu;
  * Class representing the Player.
  */
 public class Player extends Actor {
-    private Menu menu; // Just declare it, don't initialize here
     private WeaponItem equippedWeapon;
 
     /**
      * Constructor.
      *
-     * @param name        Name to call the player in the UI
-     * @param displayChar Character to represent the player in the UI
-     * @param hitPoints   Player's starting number of hit points
+     * @param name        the name of the Player
+     * @param displayChar the character that will represent the Player in the display
+     * @param hitPoints   the Player's starting hit points
      */
     public Player(String name, char displayChar, int hitPoints) {
         super(name, displayChar, hitPoints);
         this.addCapability(Status.HOSTILE_TO_ENEMY);
         this.setIntrinsicWeapon(new BareFist());
-        this.addAttribute(BaseActorAttributes.STAMINA, new BaseActorAttribute(200));
-        this.equippedWeapon = null;
+
+        // Add stamina attribute to player with initial value of 100
+        this.addAttribute(BaseActorAttributes.STAMINA, new BaseActorAttribute(100));
     }
 
     /**
-     * Overridden hurt method to handle death messages
+     * Decrease the player's health by the specified points
      *
-     * @param points number of hit points to deduct
+     * @param points the points to decrease health by
      */
     @Override
     public void hurt(int points) {
         super.hurt(points);
-
-        // Check if player is unconscious (dead) after taking damage
         if (!isConscious()) {
             System.out.println(FancyMessage.YOU_DIED);
         }
     }
 
     /**
-     * Apply stamina cost when attacking
-     * Called by AttackAction when the player performs an attack
+     * Apply stamina cost for attacking
      */
     public void applyAttackStaminaCost() {
-        // Standard stamina cost for attacks is 20 points
-        int staminaCost = 20;
-
-        // Only apply cost if player has stamina attribute
+        // Decrease stamina by 15 for each attack
         if (this.hasAttribute(BaseActorAttributes.STAMINA)) {
-            this.modifyAttribute(BaseActorAttributes.STAMINA,
-                    ActorAttributeOperations.DECREASE,
-                    staminaCost);
+            this.modifyAttribute(BaseActorAttributes.STAMINA, ActorAttributeOperations.DECREASE, 15);
         }
     }
 
     /**
-     * Select and return an action to perform on the current turn.
+     * Returns the actions the player can perform
      *
-     * @param actions    collection of possible Actions for this Actor
-     * @param lastAction The Action this Actor took last turn
+     * @param actions    collection of possible Actions
+     * @param lastAction the Action this Actor took last turn
      * @param map        the map containing the Actor
      * @param display    the I/O object to which messages may be written
-     * @return the Action to be performed
+     * @return list of actions the player can perform
      */
     @Override
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
@@ -79,7 +72,7 @@ public class Player extends Actor {
             // Print message in case the unconscious state was reached by other means
             System.out.println(FancyMessage.YOU_DIED);
             // The engine will handle removal of unconscious actors
-            return null;
+            return new DoNothingAction();
         }
 
         // Handle normal turn
@@ -87,10 +80,10 @@ public class Player extends Actor {
                 this.getAttributeMaximum(BaseActorAttributes.HEALTH) + "), " +
                 "stamina: " + this.getAttribute(BaseActorAttributes.STAMINA));
 
-        // Create a new menu with the current actions
-        this.menu = new Menu(actions);
+        // Create a new Menu with the current actions for this turn
+        Menu menu = new Menu(actions);
 
-        // Use the public method to show menu
+        // Return the result of showMenu
         return menu.showMenu(this, display);
     }
 
