@@ -34,7 +34,8 @@ public class FollowBehaviour implements Behaviour {
         int minDistance = Integer.MAX_VALUE;
         for (Exit exit : actorLocation.getExits()) {
             Location destination = exit.getDestination();
-            if (!destination.containsAnActor() && destination.getGround().canActorEnter(actor)) {
+            // Important: Check both canActorEnter and that the ground itself allows entry
+            if (!destination.containsAnActor() && destination.canActorEnter(actor)) {
                 int newDistance = Math.abs(destination.x() - targetLocation.x()) + Math.abs(destination.y() - targetLocation.y());
                 if (newDistance < minDistance) {
                     minDistance = newDistance;

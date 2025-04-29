@@ -40,10 +40,8 @@ public class Player extends Actor {
      */
     @Override
     public void hurt(int points) {
+        boolean wasAlive = isConscious(); // Check if player was alive before taking damage
         super.hurt(points);
-        if (!isConscious()) {
-            System.out.println(FancyMessage.YOU_DIED);
-        }
     }
 
     /**
@@ -69,21 +67,19 @@ public class Player extends Actor {
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
         // Check if player is unconscious at the beginning of their turn
         if (!isConscious()) {
-            // Print message in case the unconscious state was reached by other means
-            System.out.println(FancyMessage.YOU_DIED);
-            // The engine will handle removal of unconscious actors
-            return new DoNothingAction();
+            // Print death message prominently and end the game
+            display.println(FancyMessage.YOU_DIED);
+            // Force game termination after displaying death message
+            map.removeActor(this);  // Remove player from map
+            return new DoNothingAction();  // Return DoNothing to prevent further actions
         }
 
-        // Handle normal turn
+        // Rest of method remains the same
         display.println(this + " (" + this.getAttribute(BaseActorAttributes.HEALTH) + "/" +
                 this.getAttributeMaximum(BaseActorAttributes.HEALTH) + "), " +
                 "stamina: " + this.getAttribute(BaseActorAttributes.STAMINA));
 
-        // Create a new Menu with the current actions for this turn
         Menu menu = new Menu(actions);
-
-        // Return the result of showMenu
         return menu.showMenu(this, display);
     }
 

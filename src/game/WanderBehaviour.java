@@ -26,7 +26,8 @@ public class WanderBehaviour implements Behaviour {
         Collections.shuffle(exits);
         for (Exit exit : exits) {
             Location destination = exit.getDestination();
-            if (!destination.containsAnActor() && destination.getGround().canActorEnter(actor)) {
+            // Important: Must use canActorEnter which checks the ground's rules
+            if (!destination.containsAnActor() && destination.canActorEnter(actor)) {
                 return new MoveActorAction(destination, exit.getName());
             }
         }

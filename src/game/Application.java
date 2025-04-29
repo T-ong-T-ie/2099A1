@@ -66,8 +66,8 @@ public class Application {
         gameMap.at(21, 9).addActor(new OmenSheep());
 
         gameMap.at(22, 9).addItem(new Talisman());
-        gameMap.at(18, 7).addActor(new RotWolf(player));
-        gameMap.at(25, 12).addActor(new RotWolf(player));
+        gameMap.at(5, 5).addActor(new RotWolf(player));
+        gameMap.at(9, 9).addActor(new RotWolf(player));
 
         world.run();
     }

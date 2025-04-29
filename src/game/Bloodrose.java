@@ -16,6 +16,7 @@ public class Bloodrose extends Plant {
         super("Bloodrose", 'w');
     }
 
+    // Fix for Bloodrose.java
     @Override
     protected void applyEffect(Location location) {
         // Damage surrounding actors (including the current location)
@@ -23,11 +24,12 @@ public class Bloodrose extends Plant {
             Location destination = exit.getDestination();
             if (destination.containsAnActor()) {
                 Actor target = destination.getActor();
+                boolean wasAlive = target.isConscious();
                 target.hurt(10);
 
-                // If player dies, show death message
-                if (!target.isConscious() && target.toString().equals("Farmer")) {
-                    System.out.println("YOU DIED");
+                // Only print death message once when transitioning from alive to dead
+                if (wasAlive && !target.isConscious() && target.toString().equals("Farmer")) {
+                    System.out.println(FancyMessage.YOU_DIED);
                 }
             }
         }
@@ -35,11 +37,12 @@ public class Bloodrose extends Plant {
         // Check the current location too
         if (location.containsAnActor()) {
             Actor target = location.getActor();
+            boolean wasAlive = target.isConscious();
             target.hurt(10);
 
-            // If player dies, show death message
-            if (!target.isConscious() && target.toString().equals("Farmer")) {
-                System.out.println("YOU DIED");
+            // Only print death message once when transitioning from alive to dead
+            if (wasAlive && !target.isConscious() && target.toString().equals("Farmer")) {
+                System.out.println(FancyMessage.YOU_DIED);
             }
         }
     }
