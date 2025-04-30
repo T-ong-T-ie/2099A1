@@ -65,10 +65,6 @@ public class Application {
         gameMap.at(20, 8).addActor(new SpiritGoat());
         gameMap.at(21, 9).addActor(new OmenSheep());
 
-        gameMap.at(22, 9).addItem(new Talisman());
-        gameMap.at(5, 5).addActor(new RotWolf(player));
-        gameMap.at(9, 9).addActor(new RotWolf(player));
-
         world.run();
     }
 }
