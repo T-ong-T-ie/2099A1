@@ -82,14 +82,6 @@ public abstract class RottableActor extends Actor implements Rottable {
                     }
                     if (player != null) break;
                 }
-
-                // Add the RotWolf at the same location where this actor was
-                if (player != null) {
-                    map.addActor(new RotWolf(player), currentLocation);
-                } else {
-                    // If no player found, create a RotWolf with null target (it will just wander)
-                    map.addActor(new RotWolf(null), currentLocation);
-                }
             }
             return new DoNothingAction();
         }
