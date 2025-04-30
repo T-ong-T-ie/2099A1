@@ -16,7 +16,7 @@ public class Talisman extends WeaponItem {
      * Constructor for Talisman.
      */
     public Talisman() {
-        super("Talisman", 'T', 40, "blesses", 80);
+        super("Talisman", 'o', 40, "blesses", 80);
     }
 
     @Override
