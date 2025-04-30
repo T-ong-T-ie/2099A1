@@ -16,7 +16,7 @@ public class OmenSheep extends RottableActor {
      * Constructor for OmenSheep.
      */
     public OmenSheep() {
-        super("Omen Sheep", 'S', 50, 15); // 15 turns countdown
+        super("Omen Sheep", 'm', 75, 15); // 15 turns countdown
         this.addCapability(Status.NON_HOSTILE);
         this.wanderBehaviour = new WanderBehaviour();
     }
