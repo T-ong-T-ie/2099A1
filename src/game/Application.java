@@ -63,7 +63,7 @@ public class Application {
 
         // In Application.java, after adding the player
         gameMap.at(20, 8).addActor(new SpiritGoat());
-        gameMap.at(21, 9).addActor(new OmenSheep());
+        gameMap.at(21, 5).addActor(new OmenSheep());
 
         world.run();
     }
