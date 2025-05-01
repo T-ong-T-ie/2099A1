@@ -53,8 +53,8 @@ public class AttackAction extends Action {
                 return actor.getIntrinsicWeapon().attack(actor, target, map);
             } else {
                 // Fallback to a basic attack if no intrinsic weapon
-                target.hurt(5);
-                return actor + " attacks " + target + " for 5 damage";
+                target.hurt(25);
+                return actor + " attacks " + target + " for 25 damage";
             }
         }
     }
